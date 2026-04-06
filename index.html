@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>当贝遥控器</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="top-bar app-loading" id="topBar">
+    <svg id="topBarIcon" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="12" fill="white"/>
+        <path d="M12 7v6 M12 16.5v.5" stroke="#4cd964" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <span id="topBarText">设备未连接，点击查看</span>
+  </div>
+
+  <div class="remote-container app-loading" id="remoteContainer">
+    <div class="row">
+      <button class="icon-btn danger" data-key="power">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M18.36 6.64A9 9 0 1 1 5.64 6.64"/>
+            <line x1="12" y1="2" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <span class="btn-text">电源</span>
+      </button>
+
+      <button class="icon-btn danger" data-key="shutdown">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <span class="btn-text">快速关机</span>
+      </button>
+
+      <button class="icon-btn normal" data-key="reboot">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+        </div>
+        <span class="btn-text">重启</span>
+      </button>
+
+      <button class="icon-btn normal" data-key="sidebar">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <line x1="6" y1="5" x2="6" y2="19"/>
+            <line x1="10" y1="12" x2="20" y2="12"/>
+            <polyline points="14 8 10 12 14 16"/>
+          </svg>
+        </div>
+        <span class="btn-text">侧边键</span>
+      </button>
+    </div>
+
+    <div class="row">
+      <button class="icon-btn normal" data-key="volumedown">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          </svg>
+        </div>
+        <span class="btn-text">音量-</span>
+      </button>
+
+      <div class="volume-slider-container">
+        <div class="volume-slider-wrap">
+          <div class="volume-slider-active" id="volumeFill" style="width: 13%"></div>
+          <input type="range" min="0" max="15" value="2" class="volume-slider" id="volumeSlider">
+        </div>
+      </div>
+
+      <button class="icon-btn normal" data-key="volumeup">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15 9a5 5 0 0 1 0 6"/>
+            <path d="M19 5a10 10 0 0 1 0 14"/>
+          </svg>
+        </div>
+        <span class="btn-text">音量+</span>
+      </button>
+    </div>
+
+    <div class="dpad-container">
+      <div class="dpad">
+        <button class="dpad-arrow up" data-key="up">
+          <svg viewBox="0 0 24 24"><polygon points="12,4 20,16 4,16"/></svg>
+        </button>
+        <button class="dpad-arrow down" data-key="down">
+          <svg viewBox="0 0 24 24"><polygon points="12,20 20,8 4,8"/></svg>
+        </button>
+        <button class="dpad-arrow left" data-key="left">
+          <svg viewBox="0 0 24 24"><polygon points="4,12 16,4 16,20"/></svg>
+        </button>
+        <button class="dpad-arrow right" data-key="right">
+          <svg viewBox="0 0 24 24"><polygon points="20,12 8,4 8,20"/></svg>
+        </button>
+
+        <button class="dpad-ok" data-key="ok">OK</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="icon-btn normal" data-key="find">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <rect x="7" y="3" width="10" height="18" rx="5" ry="5"/>
+            <circle cx="12" cy="8" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="15" r="0.5" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="btn-text">找遥控器</span>
+      </button>
+
+      <button class="icon-btn normal" data-key="home">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          </svg>
+        </div>
+        <span class="btn-text">主页</span>
+      </button>
+
+      <button class="icon-btn normal" data-key="menu">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <line x1="6" y1="7" x2="18" y2="7"/>
+            <line x1="6" y1="12" x2="18" y2="12"/>
+            <line x1="6" y1="17" x2="18" y2="17"/>
+          </svg>
+        </div>
+        <span class="btn-text">菜单</span>
+      </button>
+
+      <button class="icon-btn normal" data-key="back">
+        <div class="btn-circle">
+          <svg viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M9 14l-4-4 4-4"/>
+            <path d="M5 10h11a4 4 0 1 1 0 8h-1"/>
+          </svg>
+        </div>
+        <span class="btn-text">返回</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="scan-toast" id="scanToast">
+    <svg class="spinner" viewBox="0 0 24 24" stroke="white" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="2" x2="12" y2="6" opacity="1" transform="rotate(0 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.875" transform="rotate(45 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.75" transform="rotate(90 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.625" transform="rotate(135 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.5" transform="rotate(180 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.375" transform="rotate(225 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.25" transform="rotate(270 12 12)"/>
+      <line x1="12" y1="2" x2="12" y2="6" opacity="0.125" transform="rotate(315 12 12)"/>
+    </svg>
+    <span>正在扫描...</span>
+  </div>
+
+  <div class="modal-overlay" id="deviceModal">
+    <div class="bottom-sheet">
+      <div class="sheet-header">
+        <span class="sheet-title">搜索到的设备</span>
+        <button class="close-btn" id="closeModalBtn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="device-list" id="deviceListContainer">
+        <div class="device-card" id="deviceCard">
+          <div class="device-icon">
+            <svg width="42" height="30" viewBox="0 0 40 28" fill="none">
+              <rect x="2" y="6" width="36" height="18" rx="2" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1.5"/>
+              <circle cx="28" cy="15" r="5" fill="#374151"/>
+              <rect x="6" y="11" width="10" height="2" rx="1" fill="#4b5563"/>
+              <rect x="6" y="21" width="28" height="3" fill="#374151"/>
+            </svg>
+          </div>
+          <div class="device-info">
+            <div class="device-name" id="popupDeviceName">当贝投影</div>
+            <div class="device-card-status">
+              <div class="device-card-dot" id="popupStatusDot"></div>
+              <span class="device-card-status-text" id="popupStatusText">未连接</span>
+            </div>
+            <div class="device-ip" id="popupDeviceIp">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="offline-dialog" id="offlineDialog">
+    <div class="offline-dialog-content">
+      <div class="offline-dialog-title">设备未连接</div>
+      <div class="offline-dialog-message">请检查投影仪是否已开机？</div>
+      <div class="offline-dialog-buttons">
+        <button class="offline-dialog-btn offline-dialog-btn-cancel" id="offlineCancel">取消</button>
+        <button class="offline-dialog-btn offline-dialog-btn-action" id="offlineRetry">重试</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/main-simple.js"></script>
+</body>
+</html>

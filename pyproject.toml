@@ -1,0 +1,9 @@
+[project]
+name = "dangbei-control"
+version = "0.1.0"
+description = "内网遥控器 - 控制当贝设备"
+requires-python = ">=3.8"
+dependencies = [
+    "aiohttp>=3.8.0",
+    "websockets>=10.0",
+]

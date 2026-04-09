@@ -15,7 +15,7 @@ if command -v uv &> /dev/null; then
     echo ""
 
     # 获取本机IP
-    local_ip=$(python3 -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()" 2>/dev/null || echo "127.0.0.1")
+    local_ip=$(python3 -c "from server import _get_local_ip; print(_get_local_ip())" 2>/dev/null || echo "127.0.0.1")
     echo "   http://$local_ip:8080"
     echo "   http://localhost:8080 (本机)"
     echo "========================================"
@@ -49,7 +49,7 @@ echo "========================================"
 echo "  请确保运行本程序的电脑和投影设备在同一局域网内"
 echo "  在手机浏览器访问以下地址:"
 echo ""
-local_ip=$(python3 -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()" 2>/dev/null || echo "127.0.0.1")
+local_ip=$(python3 -c "from server import _get_local_ip; print(_get_local_ip())" 2>/dev/null || echo "127.0.0.1")
 echo "   http://$local_ip:8080"
 echo "   http://localhost:8080 (本机)"
 echo "========================================"

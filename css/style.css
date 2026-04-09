@@ -176,7 +176,7 @@ body {
   position: relative;
 }
 
-.volume-slider-active, #volumeFill {
+#volumeFill {
   position: absolute;
   left: 0;
   top: 0;

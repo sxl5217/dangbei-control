@@ -10,7 +10,6 @@ import datetime
 import ipaddress
 import json
 import logging
-import os
 import socket
 import subprocess
 import sys
@@ -187,27 +186,6 @@ class ConfigManager:
         self.config["last_reboot_date"] = date_str
         await self._save()
 
-    def get_last_known_device_state(self) -> str:
-        """获取上次记录的设备状态"""
-        return self.config.get("last_known_device_state", STATE_OFFLINE)
-
-    async def set_last_known_device_state(self, state: str):
-        """保存设备状态"""
-        self.config["last_known_device_state"] = state
-        await self._save()
-
-    def get_last_known_device_ip(self) -> Optional[str]:
-        """获取上次记录的设备IP"""
-        return self.config.get("last_known_device_ip")
-
-    async def set_last_known_device_ip(self, ip: Optional[str]):
-        """保存设备IP"""
-        if ip:
-            self.config["last_known_device_ip"] = ip
-        else:
-            self.config.pop("last_known_device_ip", None)
-        await self._save()
-
 
 async def _check_port(ip: str, port: int, timeout: float = 0.2) -> Optional[str]:
     """检查端口是否开放"""
@@ -223,13 +201,61 @@ async def _check_port(ip: str, port: int, timeout: float = 0.2) -> Optional[str]
 
 
 def _get_local_ip() -> str:
-    """获取本机局域网 IP"""
+    """获取本机局域网 IP（不联网方式）"""
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
+        # 方法1：枚举所有网络接口
+
+        # 获取所有网卡接口
+        interfaces = []
+        try:
+            import netifaces
+            # 如果有 netifaces 库，优先使用
+            for iface in netifaces.interfaces():
+                addrs = netifaces.ifaddresses(iface)
+                if netifaces.AF_INET in addrs:
+                    for addr_info in addrs[netifaces.AF_INET]:
+                        ip = addr_info['addr']
+                        if not ip.startswith('127.') and not ip.startswith('169.254.'):
+                            interfaces.append(ip)
+        except ImportError:
+            # 没有 netifaces，使用 socket 自带方法
+            hostname = socket.gethostname()
+            try:
+                # 尝试通过 hostname 获取
+                addrs = socket.getaddrinfo(hostname, None, socket.AF_INET)
+                for addr in addrs:
+                    ip = addr[4][0]
+                    if not ip.startswith('127.') and not ip.startswith('169.254.'):
+                        interfaces.append(ip)
+            except Exception:
+                pass
+
+        # 移除重复
+        interfaces = list(set(interfaces))
+
+        # 优先选择常见的局域网网段
+        priority = []
+        for ip in interfaces:
+            if ip.startswith('192.168.'):
+                priority.insert(0, ip)  # 192.168.x.x 优先级最高
+            elif ip.startswith('10.'):
+                priority.append(ip)
+            elif ip.startswith('172.'):
+                # 172.16-31.x.x 是私有网段
+                try:
+                    second_octet = int(ip.split('.')[1])
+                    if 16 <= second_octet <= 31:
+                        priority.append(ip)
+                except (IndexError, ValueError):
+                    pass
+
+        if priority:
+            return priority[0]
+        if interfaces:
+            return interfaces[0]
+
+        # 都失败了，返回默认值
+        return "192.168.1.1"
     except Exception:
         return "192.168.1.1"
 
@@ -293,22 +319,6 @@ async def discover_projector(custom_network: Optional[str] = None) -> Optional[D
     return None
 
 
-async def send_command_to_device(ip: str, command: str | list) -> bool:
-    """发送命令到设备"""
-    ws_url = f"ws://{ip}:{DANGBEI_CONTROL_PORT}"
-    if isinstance(command, list):
-        async with websockets.connect(ws_url, close_timeout=3) as ws:
-            for step in command:
-                cmd = AGENT_COMMANDS.get(step)
-                if cmd and not isinstance(cmd, list):
-                    await ws.send(cmd)
-                    await asyncio.sleep(0.5)
-        return True
-    else:
-        async with websockets.connect(ws_url, close_timeout=3) as ws:
-            await ws.send(command)
-            await asyncio.sleep(0.1)
-        return True
 
 
 class ControlServer:
@@ -340,10 +350,9 @@ class ControlServer:
                 web.post("/api/scan", self.handle_scan),
             ]
         )
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        app.router.add_static("/css/", path=os.path.join(current_dir, "css"))
-        app.router.add_static("/js/", path=os.path.join(current_dir, "js"))
-        app.router.add_static("/", path=current_dir)
+        app.router.add_static("/css/", path=str(BASE_DIR / "css"))
+        app.router.add_static("/js/", path=str(BASE_DIR / "js"))
+        app.router.add_static("/", path=str(BASE_DIR))
         app.on_startup.append(self._on_startup)
         app.on_cleanup.append(self._on_cleanup)
         return app
@@ -477,8 +486,7 @@ class ControlServer:
                 await asyncio.sleep(5)
 
     async def index(self, request):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(current_dir, "index.html"), "r", encoding="utf-8") as f:
+        with open(BASE_DIR / "index.html", "r", encoding="utf-8") as f:
             return web.Response(text=f.read(), content_type="text/html")
 
     async def _safe_scan(self) -> Optional[Device]:
@@ -558,7 +566,7 @@ class ControlServer:
                         cmd = AGENT_COMMANDS.get(step)
                         if cmd and not isinstance(cmd, list):
                             await asyncio.wait_for(ws.send(cmd), timeout=0.5)
-                            await asyncio.sleep(0.5)
+                            await asyncio.sleep(0.6)
                 else:
                     await asyncio.wait_for(ws.send(command), timeout=0.5)
                     await asyncio.sleep(0.1)
@@ -740,14 +748,7 @@ class ControlServer:
         web.run_app(self.app, host=self.host, port=self.port)
 
     def _get_local_ip(self) -> str:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            ip = s.getsockname()[0]
-            s.close()
-            return ip
-        except Exception:
-            return "127.0.0.1"
+        return _get_local_ip()
 
 
 def main():

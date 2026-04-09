@@ -16,7 +16,7 @@ if not errorlevel 1 (
     echo.
 
     REM 获取本机IP并显示
-    python -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(f'   http://{s.getsockname()[0]}:8080'); s.close()" 2>nul || echo   http://[您的电脑IP]:8080
+    python -c "from server import _get_local_ip; print(f'   http://{_get_local_ip()}:8080')" 2>nul || echo   http://[您的电脑IP]:8080
     echo   http://localhost:8080 (本机)
     echo ========================================
     echo.
@@ -71,7 +71,7 @@ echo ========================================
 echo   请确保运行本程序的电脑和投影设备在同一局域网内
 echo   在手机浏览器访问以下地址:
 echo.
-%PYTHON_CMD% -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(f'   http://{s.getsockname()[0]}:8080'); s.close()" 2>nul || echo   http://[您的电脑IP]:8080
+%PYTHON_CMD% -c "from server import _get_local_ip; print(f'   http://{_get_local_ip()}:8080')" 2>nul || echo   http://[您的电脑IP]:8080
 echo   http://localhost:8080 (本机)
 echo ========================================
 echo.
